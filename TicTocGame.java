@@ -1,5 +1,5 @@
 import java.util.Scanner;
-
+import java.util.Random;
 /**
 Author : Dewmal dewmalnilanka@gmail.comm
 Date : 2018.10.14
@@ -14,15 +14,22 @@ public class TicTocGame {
 	private char gameDefaultMark='-'; // Check to set 
 
 	// Iinitiate Player Array
-	private int numberOfPlayers=3;
+	private int numberOfPlayers=2;
 	private String players[]=new String[numberOfPlayers];
 	private char playSymbols[]=new char[]{'X','O','Y'};
 
 	// Getting Keyboard inputs
 	private Scanner keyboard= new Scanner(System.in);
 
+	//
+	private AIPlayer agents[];
 
 	TicTocGame(){
+		initiateGameScreen(); // Initiate Game Screen Here
+	}
+
+	TicTocGame(AIPlayer ...agents){
+		this.agents=agents;
 		initiateGameScreen(); // Initiate Game Screen Here
 	}
 
@@ -198,13 +205,34 @@ public class TicTocGame {
 			boolean isSuccessInput=false;
 			do{
 
-				System.out.println("P: "+playerName+" Next Position x.y=>");			
-				String nextPositionLine=keyboard.nextLine();
-				char pos[]=nextPositionLine.toCharArray();
+				int posX=-1;
+				int posY=-1;
+
+				System.out.println("P: "+playerName+" Next Position x.y=>");	
+
+				AIPlayer agent=null;
+
+				if(agents.length>currentPlayer){
+					agent=agents[currentPlayer];
+				}
+
+				if (agent!=null){
+
+					Position pos=agent.playGame(this.gameBoard);
+					posX=pos.x;
+					posY=pos.y;
+
+				}else{
+					String nextPositionLine=keyboard.nextLine();
+					char pos[]=nextPositionLine.toCharArray();
+					posX=Integer.parseInt(pos[0]+"");
+					posY=Integer.parseInt(pos[2]+"");
+				}
+
+				
 
 			
-				int posX=Integer.parseInt(pos[0]+"");
-				int posY=Integer.parseInt(pos[2]+"");
+				
 
 				if (posX>0 && posY>0 && posX<=gameBoardNumberOfRows&&posY<=gameBoardNumberOfColumns){
 					char gameMark=gameBoard[posX-1][posY-1];
@@ -217,7 +245,6 @@ public class TicTocGame {
 				}else{
 					System.out.println("Invalid Position");
 				}
-
 						
 
 			}while(!isSuccessInput);
@@ -247,11 +274,39 @@ public class TicTocGame {
 
 
 	public static void main(String[] args) {
+
+		AIPlayer p1=new AIPlayer();
+		// AIPlayer p1=new AIPlayer();
 		
-		TicTocGame game= new TicTocGame();
+		TicTocGame game= new TicTocGame(p1);
 		game.play();
 		
 	}
 	
+
+}
+
+class Position{
+	public int x;
+	public int y;
+}
+
+class AIPlayer{
+
+	private Random rand=new Random();
+
+
+	public Position playGame(char[][] gameScreen){		
+		Position pos=new Position();
+
+		int rowLength=gameScreen[0].length;
+		int colLength=gameScreen[1].length;
+
+		pos.x=(rand.nextInt()%rowLength)+1;
+		pos.y=(rand.nextInt()%colLength)+1;
+
+
+		return pos;
+	} 
 
 }
